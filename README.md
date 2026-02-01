@@ -88,8 +88,9 @@ when running terminal apps like Claude Code that rely on it.
 [Mosh](https://mosh.org) replaces the SSH transport with a UDP-based protocol.
 It uses SSH for initial authentication, then hands off to a UDP channel. This
 means your existing SSH keys and config just work — no separate auth setup. The
-tradeoff: you get better responsiveness on bad connections, but lose true color
-support (as of v1.3.2).
+tradeoff: you get better responsiveness on bad connections, but true color
+requires v1.4.0+ which some distros don't ship yet (see
+[Fixing Colors](#fixing-colors)).
 
 ### Why mosh over SSH
 
@@ -103,8 +104,8 @@ support (as of v1.3.2).
 | Use case                          | Recommendation       |
 |-----------------------------------|----------------------|
 | Stable connection (LAN, wired)    | SSH + tmux           |
-| True color apps (Claude Code)     | SSH + tmux           |
 | Mobile / high latency / roaming   | Mosh + tmux          |
+| True color apps (mosh < 1.4.0)    | SSH + tmux           |
 | No sudo on remote machine         | Mosh (from source)   |
 
 ### Installation
@@ -198,25 +199,18 @@ tmux -2 new -s main           # force 256-color
 TERM=screen tmux new -s main  # force basic
 ```
 
-### Mosh true color limitation
+### Mosh true color
 
-Mosh 1.3.2 (current stable) does not support true color (24-bit). Apps that
-use true color will render incorrectly — missing colors, white text on white
-background.
+Mosh supports true color (24-bit) since v1.4.0. However, some distros
+(including Ubuntu) still ship v1.3.2 via `apt`, which doesn't handle true
+color — apps will render with missing colors or white text on white background.
 
-True color support was [merged into mosh's master branch](https://github.com/mobile-shell/mosh/pull/939)
-in 2017, but no stable release has included it since. If you need true color
-over mosh, you'll have to build from source (see the
-[from source](#from-source-no-sudo) section above — same process, just clone
-from `master`).
+**Fix:** build mosh 1.4.0+ from source (see the
+[from source](#from-source-no-sudo) section above).
 
 **Workaround (without rebuilding):** unset `COLORTERM` before launching the
-app so it falls back to 256 colors, which mosh handles fine:
+app so it falls back to 256 colors, which older mosh handles fine:
 
 ```bash
 unset COLORTERM
 ```
-
-If you need true color and don't want to build from source, use SSH + tmux
-instead. Since tmux already handles session persistence, mosh's reconnection
-benefit is less critical for stationary use.
