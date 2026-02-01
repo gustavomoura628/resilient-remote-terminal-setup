@@ -9,7 +9,7 @@ The setup combines three layers:
 | Layer         | Tool           | Role                                              |
 |---------------|----------------|---------------------------------------------------|
 | Networking    | **Tailscale**  | Stable IPs, NAT traversal, encrypted WireGuard    |
-| Transport     | **SSH / Mosh** | SSH for full-featured, mosh for high-latency      |
+| Transport     | **SSH / Mosh** | SSH for simplicity, mosh for resilience            |
 | Persistence   | **tmux**       | Detach/reattach sessions, survives disconnects     |
 
 You don't need all three — each section stands alone. But together they give
@@ -30,7 +30,7 @@ Tailscale establishes direct peer-to-peer connections when possible:
 ## tmux
 
 tmux is a terminal multiplexer — it lets you run sessions that persist
-independently of your terminal connection. If your SSH drops, everything keeps
+independently of your terminal connection. If your connection drops, everything keeps
 running. You just reconnect and reattach.
 
 ### Key concepts
@@ -65,8 +65,7 @@ tmux ls                 # List sessions
 
 ## SSH + tmux
 
-The baseline setup. SSH gives you a full-featured connection with true color
-support, and tmux handles persistence.
+The baseline setup. SSH handles the connection, tmux handles persistence.
 
 Start a new session:
 
@@ -80,33 +79,23 @@ Reattach later:
 ssh user@<server-ip> -t "tmux attach -t main"
 ```
 
-This is the recommended setup when you need true color (24-bit) — for example,
-when running terminal apps like Claude Code that rely on it.
+This is a solid default for any use case, especially on stable connections.
 
 ## Mosh
 
 [Mosh](https://mosh.org) replaces the SSH transport with a UDP-based protocol.
 It uses SSH for initial authentication, then hands off to a UDP channel. This
-means your existing SSH keys and config just work — no separate auth setup. The
-tradeoff: you get better responsiveness on bad connections, but true color
-requires v1.4.0+ which some distros don't ship yet (see
-[Fixing Colors](#fixing-colors)).
-
-### Why mosh over SSH
+means your existing SSH keys and config just work — no separate auth setup. It
+does everything SSH does, plus:
 
 - **Local echo** — keystrokes display instantly, even on high-latency connections
 - **Roaming** — seamlessly survives wifi-to-mobile switches, sleep/wake, IP changes
 - **UDP-based** — avoids TCP head-of-line blocking
 - **Stateful sync** — only transmits screen diffs, not raw byte streams
 
-### When to use mosh vs SSH
-
-| Use case                          | Recommendation       |
-|-----------------------------------|----------------------|
-| Stable connection (LAN, wired)    | SSH + tmux           |
-| Mobile / high latency / roaming   | Mosh + tmux          |
-| True color apps (mosh < 1.4.0)    | SSH + tmux           |
-| No sudo on remote machine         | Mosh (from source)   |
+**Important:** true color (24-bit) requires mosh 1.4.0+. Many distros still
+ship 1.3.2 via `apt` — see [Fixing Colors](#fixing-colors) for how to get
+1.4.0.
 
 ### Installation
 
@@ -129,10 +118,10 @@ all packages first:
 pkg upgrade
 ```
 
-**From source (no sudo):**
+**From source:**
 
-If you don't have root access on the remote machine, build mosh into a local
-prefix:
+If your distro doesn't ship 1.4.0+ or you don't have root access, build mosh
+into a local prefix:
 
 ```bash
 ./configure --prefix=$HOME/.local
@@ -206,7 +195,7 @@ Mosh supports true color (24-bit) since v1.4.0. However, some distros
 color — apps will render with missing colors or white text on white background.
 
 **Fix:** build mosh 1.4.0+ from source (see the
-[from source](#from-source-no-sudo) section above).
+[from source](#from-source) section above).
 
 **Workaround (without rebuilding):** unset `COLORTERM` before launching the
 app so it falls back to 256 colors, which older mosh handles fine:
