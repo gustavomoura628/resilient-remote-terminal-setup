@@ -27,14 +27,6 @@ Tailscale establishes direct peer-to-peer connections when possible:
 - **Different networks** — uses NAT traversal for a direct connection, falls
   back to DERP relay servers only if that fails
 
-Check connection type:
-
-```bash
-tailscale status
-```
-
-Look for `direct` vs a DERP relay next to each peer.
-
 ## tmux
 
 tmux is a terminal multiplexer — it lets you run sessions that persist
@@ -68,6 +60,8 @@ tmux ls                 # List sessions
 | `Ctrl-b "`     | Split pane horizontally |
 | `Ctrl-b n`     | Next window             |
 | `Ctrl-b p`     | Previous window         |
+| `Ctrl-b [`     | Enter scroll/copy mode  |
+| `Ctrl-c`       | Exit scroll/copy mode   |
 
 ## SSH + tmux
 
@@ -159,14 +153,13 @@ alias mosh-custom='mosh --server="LD_LIBRARY_PATH=\$HOME/local/lib:\$HOME/local/
 
 ### Firewall
 
-Mosh uses UDP ports 60000-61000. If you have a firewall:
+If you're connecting over Tailscale, the traffic runs through the WireGuard
+tunnel and no firewall changes are needed. For direct connections, mosh uses
+UDP ports 60000-61000:
 
 ```bash
 sudo ufw allow 60000:61000/udp
 ```
-
-Tailscale traffic bypasses this (it runs over the WireGuard tunnel), but this
-is needed for direct connections.
 
 ## Mosh + tmux
 
