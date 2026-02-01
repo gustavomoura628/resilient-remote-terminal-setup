@@ -135,7 +135,7 @@ If you don't have root access on the remote machine, build mosh into a local
 prefix:
 
 ```bash
-./configure --prefix=$HOME/local
+./configure --prefix=$HOME/.local
 make
 make install
 ```
@@ -143,13 +143,13 @@ make install
 Then connect with a custom server path:
 
 ```bash
-mosh --server="LD_LIBRARY_PATH=\$HOME/local/lib:\$HOME/local/lib64 \$HOME/local/bin/mosh-server" user@<server-ip>
+mosh --server="LD_LIBRARY_PATH=\$HOME/.local/lib:\$HOME/.local/lib64 \$HOME/.local/bin/mosh-server" user@<server-ip>
 ```
 
 You can alias this in `~/.bashrc`:
 
 ```bash
-alias mosh-custom='mosh --server="LD_LIBRARY_PATH=\$HOME/local/lib:\$HOME/local/lib64 \$HOME/local/bin/mosh-server" user@<server-ip>'
+alias mosh-custom='mosh --server="LD_LIBRARY_PATH=\$HOME/.local/lib:\$HOME/.local/lib64 \$HOME/.local/bin/mosh-server" user@<server-ip>'
 ```
 
 ### Firewall
