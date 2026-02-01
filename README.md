@@ -27,6 +27,9 @@ Tailscale establishes direct peer-to-peer connections when possible:
 - **Different networks** — uses NAT traversal for a direct connection, falls
   back to DERP relay servers only if that fails
 
+On Android, install the [Tailscale app](https://play.google.com/store/apps/details?id=com.tailscale.ipn)
+to add your phone to the network.
+
 ## tmux
 
 tmux is a terminal multiplexer — it lets you run sessions that persist
