@@ -9,7 +9,7 @@ The setup combines three layers:
 | Layer         | Tool           | Role                                              |
 |---------------|----------------|---------------------------------------------------|
 | Networking    | **Tailscale**  | Stable IPs, NAT traversal, encrypted WireGuard    |
-| Transport     | **SSH / Mosh** | SSH for simplicity, mosh for resilience            |
+| Transport     | **SSH / Mosh** | SSH for simplicity, mosh for responsiveness and resilience |
 | Persistence   | **tmux**       | Detach/reattach sessions, survives disconnects     |
 
 You don't need all three — each section stands alone. But together they give
